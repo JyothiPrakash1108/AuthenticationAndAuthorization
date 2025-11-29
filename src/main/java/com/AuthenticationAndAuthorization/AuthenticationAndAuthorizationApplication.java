@@ -1,4 +1,4 @@
-package com.AuthenticationAndAuthorization.AuthenticationAndAuthorization;
+package com.AuthenticationAndAuthorization;
 
 
 import org.springframework.boot.SpringApplication;
