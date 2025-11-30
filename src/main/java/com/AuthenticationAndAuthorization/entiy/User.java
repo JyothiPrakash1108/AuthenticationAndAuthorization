@@ -18,7 +18,7 @@ public class User {
 	private String password;
 	private String email;
 	private String role;
-	private boolean isEnabled;
+	private boolean isEnabled = true;
 	private Date createdAt;
 	public User() {
 	

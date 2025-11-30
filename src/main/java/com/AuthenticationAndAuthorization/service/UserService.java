@@ -14,7 +14,7 @@ import com.AuthenticationAndAuthorization.entiy.User;
 import com.AuthenticationAndAuthorization.repo.UserRepo;
 
 @Service
-public class UserService implements UserDetailsService{
+public class UserService implements UserDetailsService {
 	@Autowired
 	private UserRepo userRepo;
 	@Autowired
@@ -24,14 +24,14 @@ public class UserService implements UserDetailsService{
 		user.setUsername(userDTO.getUsername());
 		user.setPassword(encoder.encode(userDTO.getPassword()));
 		user.setCreatedAt(new Date());
-		user.setEnabled(false);
+		user.setEnabled(true);
 		user.setRole("ADMIN");
-		return userRepo.save(user);
+    	return userRepo.save(user);
 	}
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		User user = userRepo.findByUsername(username);
-		if (user != null) {
+		if (user == null) {
 			throw new UsernameNotFoundException("user not found with username : "+username);
 		}
 		return org.springframework.security.core.userdetails.User.builder()
