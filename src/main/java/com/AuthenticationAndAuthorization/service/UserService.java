@@ -2,6 +2,9 @@ package com.AuthenticationAndAuthorization.service;
 
 import java.util.Date;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
+import com.AuthenticationAndAuthorization.entiy.VerificationToken;
+import com.AuthenticationAndAuthorization.repo.VerificationTokenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,6 +20,8 @@ import com.AuthenticationAndAuthorization.repo.UserRepo;
 public class UserService implements UserDetailsService {
 	@Autowired
 	private UserRepo userRepo;
+    @Autowired
+    private VerificationTokenRepo verificationTokenRepo;
 	@Autowired
 	private BCryptPasswordEncoder encoder;
 	public User registerUser(UserDTO userDTO) {
@@ -42,4 +47,26 @@ public class UserService implements UserDetailsService {
 				.build();
 	}
 
+    public void saveVerificationToken(User user, String verificationToken) {
+        VerificationToken verificationToken1 = new VerificationToken();
+        verificationToken1.setToken(verificationToken);
+        verificationToken1.setUser(user);
+        verificationToken1.setExpiry(new Date(System.currentTimeMillis()+ 1*60*1000));
+        verificationTokenRepo.save(verificationToken1);
+    }
+
+    public String verifyRegistrationToken(String token) {
+        VerificationToken registeredToken = verificationTokenRepo.findByToken(token);
+        if (registeredToken == null){
+            return "invalid! please try again";
+        }
+        if (registeredToken.getExpiry().before(new Date())){
+            return "token has expired . please register again ";
+        }
+        User user = registeredToken.getUser();
+        user.setEnabled(true);
+        userRepo.save(user);
+        verificationTokenRepo.delete(registeredToken);
+        return "user registered sucessfully";
+    }
 }

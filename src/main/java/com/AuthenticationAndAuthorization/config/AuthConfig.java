@@ -22,7 +22,7 @@ public class AuthConfig {
                 .csrf(csrf -> csrf.disable())
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register","/h2-console/**").permitAll()
+                        .requestMatchers("/register/**","/h2-console/**").permitAll()
                         .anyRequest()
                         .authenticated()
                 )

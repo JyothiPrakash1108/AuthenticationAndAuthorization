@@ -6,10 +6,9 @@ import com.AuthenticationAndAuthorization.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -17,8 +16,17 @@ public class UserController {
 	private UserService userService;
 	@PostMapping("/register")
 	public User registerUser(@RequestBody UserDTO userDTO) {
-		return userService.registerUser(userDTO);
+        User user = userService.registerUser(userDTO);
+        String verificationToken = UUID.randomUUID().toString();
+        String verificationURL = "http://localhost:8080/register/verifyRegistrationToken?token="+verificationToken;
+		System.out.println("Verify the user by clicking the following link : "+verificationURL);
+        userService.saveVerificationToken(user,verificationToken);
+        return user;
 	}
+    @PostMapping("/register/verifyRegistrationToken")
+    public String verifyRegistration(@RequestParam String token){
+        return userService.verifyRegistrationToken(token);
+    }
     @GetMapping("/hey")
     public String greet(){
         return "hey";
