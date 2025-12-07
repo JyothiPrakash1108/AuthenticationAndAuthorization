@@ -2,9 +2,9 @@ package com.AuthenticationAndAuthorization.service;
 
 import java.util.Date;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import com.AuthenticationAndAuthorization.entiy.VerificationToken;
 import com.AuthenticationAndAuthorization.repo.VerificationTokenRepo;
+import com.AuthenticationAndAuthorization.util.JWTUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -68,5 +68,13 @@ public class UserService implements UserDetailsService {
         userRepo.save(user);
         verificationTokenRepo.delete(registeredToken);
         return "user registered sucessfully";
+    }
+
+    public String generateToken(String username) {
+        User fetchedUser = userRepo.findByUsername(username);
+        if(fetchedUser == null){
+            return "User Not found with user username : " + username;
+        }
+        return JWTUtil.generateJwtToken(fetchedUser);
     }
 }

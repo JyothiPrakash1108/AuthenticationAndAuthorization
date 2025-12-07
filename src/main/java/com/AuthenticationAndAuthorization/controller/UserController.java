@@ -5,7 +5,9 @@ import com.AuthenticationAndAuthorization.entiy.User;
 import com.AuthenticationAndAuthorization.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -14,6 +16,8 @@ import java.util.UUID;
 public class UserController {
 	@Autowired
 	private UserService userService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 	@PostMapping("/register")
 	public User registerUser(@RequestBody UserDTO userDTO) {
         User user = userService.registerUser(userDTO);
@@ -30,5 +34,18 @@ public class UserController {
     @GetMapping("/hey")
     public String greet(){
         return "hey";
+    }
+
+    @PostMapping("/signin")
+    public String login(@RequestBody UserDTO userDTO){
+        String username = userDTO.getUsername();
+        String password = userDTO.getPassword();
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(username,password)
+        );
+        if(auth.isAuthenticated()){
+            return userService.generateToken(username);
+        }
+        return "signin failed";
     }
 }
